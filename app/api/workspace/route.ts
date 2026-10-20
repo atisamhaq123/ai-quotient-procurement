@@ -5,7 +5,7 @@ import {PLANS,type PlanId} from '../../../lib/plans';
 
 export async function GET(request:Request){try{
  const {client,user}=await identity();
- const organizations=check(await client.from('organizations').select('id,name,created_at,plan,subscription_status,trial_ends_at,billing_period_end,cancel_at_period_end,stripe_customer_id').order('created_at'))||[];
+ const organizations=check(await client.from('organizations').select('id,name,created_at,plan,subscription_status,trial_ends_at,billing_period_end,cancel_at_period_end,stripe_customer_id,stripe_subscription_id').order('created_at'))||[];
  const url=new URL(request.url),id=url.searchParams.get('organization')||organizations[0]?.id;
  if(!id)return Response.json({organizations:[],purchases:[],current:null,members:[],invitations:[],audit:[],dailyUsed:0,billing:null,user:{email:user.email,id:user.id}},{headers:{'Cache-Control':'private, no-store'}});
  if(!uuid(id)||!organizations.some(o=>o.id===id))throw new AppError('Organization unavailable. Select one of your organizations.',403);
@@ -24,8 +24,8 @@ export async function GET(request:Request){try{
  check({data:null,error:usageResult.error});
  const selected=organizations.find(o=>o.id===id)!,plan=(selected.plan in PLANS?selected.plan:'starter') as PlanId,limits=PLANS[plan];
  const entitlementActive=selected.subscription_status==='active'||selected.subscription_status==='trialing'&&new Date(selected.billing_period_end||selected.trial_ends_at).getTime()>Date.now();
- const billing={plan,status:selected.subscription_status,trialEndsAt:selected.trial_ends_at,periodEnd:selected.billing_period_end,cancelAtPeriodEnd:selected.cancel_at_period_end,hasCustomer:!!selected.stripe_customer_id,active:entitlementActive,limits:{members:limits.members,purchases:limits.purchases,aiDaily:limits.aiDaily}};
- return Response.json({organizations:organizations.map(({plan:_,subscription_status:__,trial_ends_at:___,billing_period_end:____,cancel_at_period_end:_____,stripe_customer_id:______,...organization})=>organization),organization:id,purchases,current,members:check(memberResult),invitations:check(invitationResult),audit:check(auditResult),dailyUsed:usageResult.count||0,billing,user:{email:user.email,id:user.id}},{headers:{'Cache-Control':'private, no-store'}});
+ const billing={plan,status:selected.subscription_status,trialEndsAt:selected.trial_ends_at,periodEnd:selected.billing_period_end,cancelAtPeriodEnd:selected.cancel_at_period_end,hasCustomer:!!selected.stripe_customer_id,hasSubscription:!!selected.stripe_subscription_id,active:entitlementActive,limits:{members:limits.members,purchases:limits.purchases,aiDaily:limits.aiDaily}};
+ return Response.json({organizations:organizations.map(({plan:_,subscription_status:__,trial_ends_at:___,billing_period_end:____,cancel_at_period_end:_____,stripe_customer_id:______,stripe_subscription_id:_______,...organization})=>organization),organization:id,purchases,current,members:check(memberResult),invitations:check(invitationResult),audit:check(auditResult),dailyUsed:usageResult.count||0,billing,user:{email:user.email,id:user.id}},{headers:{'Cache-Control':'private, no-store'}});
  }catch(e){return failure(e);}}
 
 export async function POST(request:Request){try{
