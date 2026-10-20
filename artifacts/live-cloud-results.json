@@ -1,0 +1,19 @@
+{
+  "runId": "98f0baac-d19b-4e6d-bf32-9d4fd1273e6e",
+  "checks": [
+    "real email/password login and cookie sessions",
+    "organization onboarding",
+    "cross-tenant API denial",
+    "live database RLS isolation",
+    "email-bound invitation acceptance",
+    "saved request retrieval and real RPC response shape",
+    "owner-only approval and approved-record lock",
+    "live OpenAI review and tenant-scoped persistence",
+    "immediate membership revocation",
+    "live tenant audit trail",
+    "independent second organization: true"
+  ],
+  "temporaryAccountsRemoved": true,
+  "cleanupRequiredForUserIds": [],
+  "emailDeliveryTested": false
+}

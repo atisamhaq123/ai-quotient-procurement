@@ -1,0 +1,11 @@
+{
+  "status": "blocked",
+  "failures": [
+    "Email confirmation is disabled."
+  ],
+  "warnings": [
+    "The app URL uses HTTP. Public production deployment must use HTTPS.",
+    "Verify confirmation/recovery email delivery, production redirect URLs, SMTP delivery limits, backups with a restore test, hosting logs/alerts, and privacy/support documentation before public launch."
+  ],
+  "paidBillingEnabled": false
+}

@@ -1,0 +1,1 @@
+export default function Loading(){return <main className="auth-page"><div className="auth-body" role="status"><p className="eyebrow">QUOTIENT / PROCUREMENT OS</p><h1>Loading your workspace.</h1><p className="auth-subtitle">Connecting to your organization.</p></div></main>;}

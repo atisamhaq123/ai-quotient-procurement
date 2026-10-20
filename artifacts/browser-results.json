@@ -21,7 +21,12 @@
     "responsive layouts",
     "nonblank cost chart",
     "unauthenticated AI denied",
-    "no runtime errors"
+    "no runtime errors",
+    "security headers",
+    "request search",
+    "approval/reopen locking",
+    "JSON backup",
+    "duplicate request"
   ],
   "liveSupabaseVerified": false
 }

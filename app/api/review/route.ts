@@ -1,14 +1,16 @@
 import {context,origin,admin,check,failure,AppError} from '../../../lib/server';
 import {uuid,validatePurchase} from '../../../lib/validation';
 import {total} from '../../../lib/quotes';
+import {readJSON} from '../../../lib/http';
 export const maxDuration=60;
 export async function POST(request:Request){let ticket:string|undefined;try{
- origin(request);const body=await request.json();if(!uuid(body.organization)||!uuid(body.purchase)||!Number.isInteger(body.version))throw new AppError('Invalid review request.');
+ origin(request);const body=await readJSON(request,4000);if(!uuid(body.organization)||!uuid(body.purchase)||!Number.isInteger(body.version))throw new AppError('Invalid review request.');
  const {client}=await context(body.organization);
  if(!process.env.OPENAI_API_KEY||!process.env.OPENAI_CHAT_MODEL||!process.env.SUPABASE_SERVICE_ROLE_KEY)throw new AppError('AI review is not configured on the server yet.',503);
  const purchase=check(await client.from('purchases').select('*').eq('organization_id',body.organization).eq('id',body.purchase).single());
  if(purchase.version!==body.version)throw new AppError('This request changed. Reload before reviewing.',409);
- const data=validatePurchase(purchase);if(data.quotes.length<2)throw new AppError('Add at least two quotations before requesting an AI review.');
+ let data;try{data=validatePurchase(purchase);}catch{throw new AppError('The saved quotation data is invalid. Correct it before reviewing.');}if(data.quotes.length<2)throw new AppError('Add at least two quotations before requesting an AI review.');
+ if(new TextEncoder().encode(JSON.stringify(data)).length>60000)throw new AppError('This request is too large for AI review. Reduce the number of items or shorten supplier terms. Deterministic comparisons remain available.',413);
  ticket=check(await client.rpc('reserve_ai',{org:body.organization,purchase_id:body.purchase,expected_version:body.version}));
  const response=await fetch('https://api.openai.com/v1/chat/completions',{
   method:'POST',headers:{Authorization:`Bearer ${process.env.OPENAI_API_KEY}`,'Content-Type':'application/json'},signal:AbortSignal.timeout(45000),
