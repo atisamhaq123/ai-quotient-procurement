@@ -1,0 +1,2 @@
+import {identity,origin,check,failure,AppError} from '../../../lib/server';
+export async function POST(request:Request){try{origin(request);const {client}=await identity();const body=await request.json();if(typeof body.token!=='string'||body.token.length!==72)throw new AppError('Invalid invitation.');const id=check(await client.rpc('accept_invitation',{invite_token:body.token}));return Response.json({organization:id});}catch(e){return failure(e);}}

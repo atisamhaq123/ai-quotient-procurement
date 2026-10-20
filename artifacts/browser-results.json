@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "widths": [
+    360,
+    390,
+    768,
+    1024,
+    1440
+  ],
+  "checks": [
+    "auth screens",
+    "password visibility",
+    "protected /app redirect",
+    "CSV import",
+    "explicit save and persistence",
+    "shortlist",
+    "simulated AI isolation",
+    "new purchase",
+    "mobile team navigation",
+    "invitation preview",
+    "responsive layouts",
+    "nonblank cost chart",
+    "unauthenticated AI denied",
+    "no runtime errors"
+  ],
+  "liveSupabaseVerified": false
+}
